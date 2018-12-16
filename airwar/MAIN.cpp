@@ -9,91 +9,112 @@
 //#pragma comment(lib,"WINMM.lib")
 
 //宏定义
-
-
+#define Num 120
+#define NumOfBullet 20
 
 //全局变量声明
-IMAGE plane[2];
-struct people {
+typedef struct object {
 	int x, y;
-	int _x, _y;
-}person={0,0,250,250};
-
-
+}object;
+int score;
+int speed;
 
 //函数声明
 void init();
+int menu();
 void draw();
+void playing();
+void ifsave();
+bool ifrestart();
+void readrank();
+void death();
+void load();
+
+//Game类
+class Game {
+public:
+	
+	object players[Num];//player  bullets  enemys
+	int NumberOfEnemy;//
+	
+
+	//函数声明
+	void initplane();
+	void initenemy();
+	void initbullet();
+
+	void moveplane(char);
+	void moveenemy();
+	void movebullet();
+
+	void drawall();
+
+	void pause();
+	void playing();
+
+	bool judge();
+
+	void shoot();
+};
+
+
+
 
 //函数定义
-void init() {
-	initgraph(480,600);
-	IMAGE img;
-	loadimage(&plane[0], _T("./pic/plane1.jpg"),100,100,true);
-	loadimage(&plane[1], _T("./pic/plane_mask1.jpg"),100,100,true);
-}
+void Game::playing() {
+	bool fg = 1;
+	int N1 = 10;
+	int numofbullet = 0;
+	while (fg){
+		/*if (_kibhit) {
+			moveplane();
+			pause();
+			//exits();
 
-void draw()
-{BeginBatchDraw();
-	loadimage(NULL, "./pic/timg.jpg");
-	
-//	putimage(0, 0, &people[0]);
-	//贴掩码图
-//	putimage(0,0,&plane[1], SRCINVERT);
-	putimage(0 ,0, &plane[1], NOTSRCERASE);
-	putimage(0, 0, &plane[0], SRCINVERT);
-
-
-	/*SetWorkingImage(&plane[0]);
-	putimage(0, 0, &plane[1], SRCINVERT);
-	SetWorkingImage(NULL);
-	putimage(400, 465, &plane[1], SRCAND);
-	putimage(400, 465, &plane[0], SRCPAINT);*/
-
-	EndBatchDraw();
-	Sleep(10);
-}
-
-
-
-void walk()
-{
-	if (person.x > person._x&&person.y > person._y) { person.x -= 1, person.y -= 1; return; }//左上方
-	if (person.x < person._x&&person.y > person._y) { person.x += 1, person.y -= 1; return; }//右上方
-	if (person.x > person._x&&person.y < person._y) { person.x -= 1, person.y += 1; return; }//左下方
-	if (person.x < person._x&&person.y < person._y) { person.x += 1, person.y += 1; return; }//右下方
-	if (person.x > person._x) { person.x -= 1; return; }//左
-	if (person.x < person._x) { person.x += 1; return; }//右
-	if (person.y > person._y) { person.y -= 1; return; }//上
-	if (person.y < person._y) { person.y += 1; return; }//下
-}
-
-void Changedir()
-{
-	//得到鼠标消息
-	if (MouseHit())
-	{
-		MOUSEMSG msg = GetMouseMsg();
-		switch (msg.uMsg)
-		{
-		case WM_LBUTTONDOWN://左键按下
-			person._x = msg.x - 35;
-			person._y = msg.y - 62;
-			break;
-
+		}*/
+		if (numofbullet == N1) {
+			movebullet();
+			if(judge());
 		}
+		numofbullet++;
+
+		//enmey
+
+		draw();
 
 	}
+
+
+
 }
 
 
 
 
+
+/////////////////////////////////////////////////////////////////////
 int main() {
-	init();
-	draw();
-	getchar();
-	closegraph();
-	system("pause");
+	int choose;
+	load();
+	while (1) {
+		choose=menu();
+		if (choose == 1) {
+			while (1) {
+				init();
+				playing();
+				death();
+				ifsave();
+				if (!ifrestart()) {
+					break;
+				}
+			}
+		}
+		else if (choose == 2) {
+			readrank();
+		}
+		else if (choose == 3) {
+			break;
+		}
+	}
 	return 0;
 }
