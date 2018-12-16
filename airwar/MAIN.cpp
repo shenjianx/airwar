@@ -8,12 +8,11 @@
 //#include<mmsystem.h>
 //#pragma comment(lib,"WINMM.lib")
 
-//ºê¶¨Òå
-//265165151651561651
+//å®å®šä¹‰
 //////1515151515151515
 
 
-//È«¾Ö±äÁ¿ÉùÃ÷
+//å…¨å±€å˜é‡å£°æ˜
 IMAGE plane[2];
 struct people {
 	int x, y;
@@ -22,11 +21,11 @@ struct people {
 
 
 
-//º¯ÊıÉùÃ÷
+//å‡½æ•°å£°æ˜
 void init();
 void draw();
 
-//º¯Êı¶¨Òå
+//å‡½æ•°å®šä¹‰
 void init() {
 	initgraph(480,600);
 	IMAGE img;
@@ -39,7 +38,7 @@ void draw()
 	loadimage(NULL, "./pic/timg.jpg");
 	
 //	putimage(0, 0, &people[0]);
-	//ÌùÑÚÂëÍ¼
+	//è´´æ©ç å›¾
 //	putimage(0,0,&plane[1], SRCINVERT);
 	putimage(0 ,0, &plane[1], NOTSRCERASE);
 	putimage(0, 0, &plane[0], SRCINVERT);
@@ -59,25 +58,25 @@ void draw()
 
 void walk()
 {
-	if (person.x > person._x&&person.y > person._y) { person.x -= 1, person.y -= 1; return; }//×óÉÏ·½
-	if (person.x < person._x&&person.y > person._y) { person.x += 1, person.y -= 1; return; }//ÓÒÉÏ·½
-	if (person.x > person._x&&person.y < person._y) { person.x -= 1, person.y += 1; return; }//×óÏÂ·½
-	if (person.x < person._x&&person.y < person._y) { person.x += 1, person.y += 1; return; }//ÓÒÏÂ·½
-	if (person.x > person._x) { person.x -= 1; return; }//×ó
-	if (person.x < person._x) { person.x += 1; return; }//ÓÒ
-	if (person.y > person._y) { person.y -= 1; return; }//ÉÏ
-	if (person.y < person._y) { person.y += 1; return; }//ÏÂ
+	if (person.x > person._x&&person.y > person._y) { person.x -= 1, person.y -= 1; return; }//å·¦ä¸Šæ–¹
+	if (person.x < person._x&&person.y > person._y) { person.x += 1, person.y -= 1; return; }//å³ä¸Šæ–¹
+	if (person.x > person._x&&person.y < person._y) { person.x -= 1, person.y += 1; return; }//å·¦ä¸‹æ–¹
+	if (person.x < person._x&&person.y < person._y) { person.x += 1, person.y += 1; return; }//å³ä¸‹æ–¹
+	if (person.x > person._x) { person.x -= 1; return; }//å·¦
+	if (person.x < person._x) { person.x += 1; return; }//å³
+	if (person.y > person._y) { person.y -= 1; return; }//ä¸Š
+	if (person.y < person._y) { person.y += 1; return; }//ä¸‹
 }
 
 void Changedir()
 {
-	//µÃµ½Êó±êÏûÏ¢
+	//å¾—åˆ°é¼ æ ‡æ¶ˆæ¯
 	if (MouseHit())
 	{
 		MOUSEMSG msg = GetMouseMsg();
 		switch (msg.uMsg)
 		{
-		case WM_LBUTTONDOWN://×ó¼ü°´ÏÂ
+		case WM_LBUTTONDOWN://å·¦é”®æŒ‰ä¸‹
 			person._x = msg.x - 35;
 			person._y = msg.y - 62;
 			break;
