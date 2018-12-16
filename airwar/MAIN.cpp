@@ -9,7 +9,7 @@
 //#pragma comment(lib,"WINMM.lib")
 
 //宏定义
-
+//12344412
 
 
 //全局变量声明
