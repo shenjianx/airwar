@@ -8,18 +8,18 @@
 //#include<mmsystem.h>
 //#pragma comment(lib,"WINMM.lib")
 
-//ºê¶¨Òå
+//ï¿½ê¶¨ï¿½ï¿½
 #define Num 120
 #define NumOfBullet 20
 
-//È«¾Ö±äÁ¿ÉùÃ÷
+//È«ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 typedef struct object {
 	int x, y;
 }object;
 int score;
 int speed;
 
-//º¯ÊýÉùÃ÷
+//å‡½æ•°å£°æ˜Ž
 void init();
 int menu();
 void draw();
@@ -30,7 +30,7 @@ void readrank();
 void death();
 void load();
 
-//GameÀà
+//Gameï¿½ï¿½
 class Game {
 public:
 	
@@ -38,7 +38,8 @@ public:
 	int NumberOfEnemy;//
 	
 
-	//º¯ÊýÉùÃ÷
+
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void initplane();
 	void initenemy();
 	void initbullet();
@@ -46,6 +47,7 @@ public:
 	void moveplane(char);
 	void moveenemy();
 	void movebullet();
+
 
 	void drawall();
 
@@ -60,7 +62,7 @@ public:
 
 
 
-//º¯Êý¶¨Òå
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 void Game::playing() {
 	bool fg = 1;
 	int N1 = 10;
