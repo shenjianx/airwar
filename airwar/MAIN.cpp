@@ -8,13 +8,14 @@
 //#include<mmsystem.h>
 //#pragma comment(lib,"WINMM.lib")
 
-//�궨��
+//宏定义
 #define Num 120
 #define NumOfBullet 20
 
-//ȫ�ֱ������
+//全局变量声明
 typedef struct object {
 	int x, y;
+	int type;
 }object;
 int score;
 int speed;
@@ -30,7 +31,7 @@ void readrank();
 void death();
 void load();
 
-//Game��
+//Game类
 class Game {
 public:
 	
@@ -39,14 +40,14 @@ public:
 	
 
 
-	//��������
+	//函数声明
 	void initplane();
 	void initenemy();
 	void initbullet();
 
-	void moveplane(char);
-	void moveenemy();
-	void movebullet();
+	void move_plane(char);
+	void move_enemy();
+	void move_bullet();
 
 
 	void drawall();
@@ -62,7 +63,7 @@ public:
 
 
 
-//������
+//函数定义
 void Game::playing() {
 	bool fg = 1;
 	int N1 = 10;
@@ -75,7 +76,7 @@ void Game::playing() {
 
 		}*/
 		if (numofbullet == N1) {
-			movebullet();
+			move_bullet();
 			if(judge());
 		}
 		numofbullet++;
