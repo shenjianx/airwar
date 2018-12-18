@@ -87,7 +87,7 @@ void Game::playing()
 	int count_bullet = 0;
 	int count_enemy = 0;
 	while (death)
-	{
+	{/*
 		//player move
 		if (_kbhit()) 
 		{
@@ -124,9 +124,10 @@ void Game::playing()
 			move_bullet();
 		}
 		count_bullet++;
+		*/
 		//draw
 		drawall();
-		
+		Sleep(20);
 	}
 
 
@@ -178,6 +179,7 @@ void Game::initenemy()
 	for (i = NumberOfBullet + 1; i <= NumberOfBullet + NumberOfEnemy; i++) {
 		players[i].x = SWIDTH;
 		players[i].y = rand()%SHEIGTHT;
+		printf("%d\n", players[i].y);
 		players[i].type = 2;
 	}
 }
@@ -207,6 +209,41 @@ void Game::move_plane(char x)
 	}
 	players[0].x += dir[dirx][0];
 	players[0].y += dir[dirx][1];
+}
+
+void Game::move_bullet()
+{
+	for (int i = 1; i <= NumberOfBullet; i++)
+	{
+		players[i].x += 5;
+		if (players[i].x > SWIDTH)
+		{
+			players[i].x = -1;
+			players[i].y = -1;
+		}
+	}
+}
+
+void Game::move_enemy()
+{
+	for (int i = NumberOfBullet + 1; i <= NumberOfBullet + NumberOfEnemy; i++)
+	{
+		if (players[i].x == -1 && players[i].y == -1 && players[i].type == 2)
+		{
+			players[i].x = SWIDTH;
+			players[i].y = rand() % SHEIGTHT;
+		}
+		else
+		{
+			players[i].x -= 5;
+			if (players[i].x < 0)
+			{
+				players[i].x = -1;
+				players[i].y = -1;
+			}
+		}
+	}
+
 }
 
 void Game::shoot()
@@ -334,7 +371,7 @@ int main()
 {
 	int choose;
 	srand((unsigned)time(NULL));
-	//	Game game;
+	Game game;
 	printf("测试");
 	initgraph(SWIDTH, SHEIGTHT, SHOWCONSOLE);
 	load();
@@ -344,15 +381,15 @@ int main()
 		choose = menu();
 		if (choose == 1)
 		{
-			/*	while (1) {
+				while (1) {
 					game.init();
 					game.playing();
-					death();
+				/*	death();
 					ifsave();
 					if (!ifrestart()) {
 						break;
-					}
-				}*/
+					}*/
+				}
 		}
 		else if (choose == 2)
 		{
