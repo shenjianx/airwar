@@ -132,17 +132,64 @@ void Game::init()
 
 int menu()
 {
-	RECT r1 = { 0, 340, SWIDTH, 410 };
-	RECT r2 = { 0, 410, SWIDTH, 480 };
-	RECT r3 = { 0, 480, SWIDTH, 550 };
+	int nowj;//当前选项框所在位置右下角纵坐标
+	RECT r[3] = { {0, 340, SWIDTH, 410},{0, 410, SWIDTH, 480},{0, 480, SWIDTH, 550} };
 	settextstyle(28, 0, _T("微软雅黑"));
-	drawtext(_T("开始游戏PLAY"), &r1, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	drawtext(_T("查看排名READ"), &r2, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	drawtext(_T("退出游戏EXIT"), &r3, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	settextstyle(32, 0, _T("Consolas"));
-	outtextxy(0, 0, _T("AB测试"));
-
-	return 1;
+	nowj = 0;
+	drawtext(_T("> 开始游戏PLAY <"), &r[0], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext(_T("查看排名READ"), &r[1], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext(_T("退出游戏EXIT"), &r[2], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+//	settextstyle(32, 0, _T("Consolas"));
+//	outtextxy(0, 0, _T("AB测试"));
+	while (1)
+	{
+		if (_kbhit())
+		{
+			char x = _getch();
+			if (x < 0)
+				x = _getch();
+			switch (x) {
+			case 'w':
+			case 72:
+				if (nowj == 1)
+				{
+					nowj = 0;
+					drawtext(_T("> 开始游戏PLAY <"), &r[0], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+					drawtext(_T("     查看排名READ     "), &r[1], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+				}
+				else if (nowj == 2)
+				{
+					nowj = 1;
+					drawtext(_T("> 查看排名READ <"), &r[1], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+					drawtext(_T("     退出游戏EXIT     "), &r[2], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+				}
+		//		printf("wwwwww"); 
+				break;
+			case 's':
+			case 80:
+				if (nowj == 0)
+				{
+					nowj = 1;
+					drawtext(_T("     开始游戏PLAY     "), &r[0], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+					drawtext(_T("> 查看排名READ <"), &r[1], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+				}
+				else if (nowj == 1)
+				{
+					nowj = 2;
+					drawtext(_T("     查看排名READ     "), &r[1], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+					drawtext(_T("> 退出游戏EXIT <"), &r[2], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+				}
+		//		printf("ssssss"); 
+				break;
+			case 'k':
+			case 32:
+				return nowj + 1;
+			default :
+		//		printf("%d", x);
+				break;
+			}
+		}
+	}
 }
 
 void load()
@@ -217,3 +264,51 @@ int main()
 	closegraph();
 	return 0;
 }
+
+
+
+///////////////////////////////////////////
+/*
+
+
+
+if (_kbhit())
+		{
+			char x = _getch();
+			if (x < 0)
+				x = _getch();
+			switch (x) {
+			case 'w':
+			case 72:
+				printf("wwwwww"); break;
+			case 's':
+			case 80:
+				printf("ssssss"); break;
+			case 'a':
+			case 75:
+				printf("aaaaaa"); break;
+			case 'd':
+			case 77:
+				printf("dddddd"); break;
+			case 'k':
+			case 32:
+				printf("space!"); break;
+			default :
+				printf("%d", x);
+			}
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
