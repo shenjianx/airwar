@@ -163,7 +163,7 @@ int menu()
 					drawtext(_T("> 查看排名READ <"), &r[1], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 					drawtext(_T("     退出游戏EXIT     "), &r[2], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 				}
-		//		printf("wwwwww"); 
+				printf("W or Up is pressed\n"); 
 				break;
 			case 's':
 			case 80:
@@ -179,7 +179,7 @@ int menu()
 					drawtext(_T("     查看排名READ     "), &r[1], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 					drawtext(_T("> 退出游戏EXIT <"), &r[2], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 				}
-		//		printf("ssssss"); 
+				printf("S or Down is pressed\n"); 
 				break;
 			case 'k':
 			case 32:
