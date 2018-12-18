@@ -51,9 +51,8 @@ class Game
 public:
 
 	object players[NUM];//player  bullets  enemys
-	int NumberOfEnemy;//
-	int NumberOfBullet;//
-
+	int NumberOfEnemy;//敌人数目
+	int NumberOfBullet;//子弹数目
 
 	//函数声明
 	void initplane();
@@ -71,7 +70,7 @@ public:
 	void pause();
 	void playing();
 
-	bool judge();
+	bool judge(object,object);
 
 	void shoot();
 };
@@ -82,29 +81,52 @@ public:
 //函数定义
 void Game::playing()
 {
-	bool death = 1;//标记死亡
+	bool death = 1;//标记死亡	1 存活	2 死亡
 	int bullet_speed = 10;//子弹速度
 	int enemy_speed = 15;//敌人速度
 	int count_bullet = 0;
 	int count_enemy = 0;
 	while (death)
 	{
-		/*if (_kibhit) {
-			move_plane();
-			pause();
-			//exits();
-
-		}*/
-		/*	if (count_bullet == bullet_speed) {
-				move_bullet();
-				if(judge());
+		//player move
+		if (_kbhit()) 
+		{
+			char x = _getch();
+			switch (x)
+			{
+			case 'w':
+			case 's':
+			case 'a':
+			case 'd':
+				move_plane(x); break;
+			case ' ':
+				shoot();
+				break;
+			case 27:
+				pause();
+			default:break;
 			}
-			count_bullet++;
-
-			//enmey
-
-			draw();*/
-
+			move_plane(x);
+		//	pause();
+		}
+		
+		//enemy move
+		if (count_enemy == enemy_speed)
+		{
+			count_enemy = 0;
+			move_enemy();
+		}
+		count_enemy++;
+		//bullet move
+		if (count_bullet == bullet_speed)
+		{
+			count_bullet = 0;
+			move_bullet();
+		}
+		count_bullet++;
+		//draw
+		drawall();
+		
 	}
 
 
@@ -115,19 +137,96 @@ void Game::drawall()
 {
 	cleardevice();
 	BeginBatchDraw();
+	//draw stars
 	for (int i = 0; i < MAXSTAR; i++)
 		MoveStar(i);
+	//draw player
+	//draw enemy
+	//draw bullet
 	EndBatchDraw();
 }
 
 void Game::init()
 {
+	int i;
 	//初始化星星
-	for (int i = 0; i < MAXSTAR; i++)
+	for (i = 0; i < MAXSTAR; i++)
 	{
 		InitStar(i);
 		star[i].x = rand() % 640;
 	}
+	//游戏初始化数据
+	NumberOfEnemy = 10;
+	NumberOfBullet = 20;
+	initplane();
+	initbullet();
+	initenemy();
+}
+
+void Game::initplane()
+{
+	//player	0
+	players[0].x = 0 + 20;
+	players[0].y = SHEIGTHT / 2;
+	players[0].type = 0;
+}
+
+void Game::initenemy()
+{
+	int i;
+	//enemy		2
+	for (i = NumberOfBullet + 1; i <= NumberOfBullet + NumberOfEnemy; i++) {
+		players[i].x = SWIDTH;
+		players[i].y = rand()%SHEIGTHT;
+		players[i].type = 2;
+	}
+}
+
+void Game::initbullet()
+{
+	int i;
+	//bullet	1
+	for (i = 1; i <= NumberOfBullet; i++)
+	{
+		players[i].x = -1;
+		players[i].y = -1;
+		players[i].type = 1;
+	}
+}
+
+void Game::move_plane(char x)
+{
+	int dir[4][2] = { {0,-2},{0,2},{-2,0},{2,0} };//w 0//s 1//a 2//d 3
+	int dirx;
+	switch (x)
+	{
+	case 'w':dirx = 0; break;
+	case 's':dirx = 1; break;
+	case 'a':dirx = 2; break;
+	case 'd':dirx = 3; break;
+	}
+	players[0].x += dir[dirx][0];
+	players[0].y += dir[dirx][1];
+}
+
+void Game::shoot()
+{
+	for (int i = 1; i <= NumberOfBullet; i++)
+	{
+		if (players[i].x == -1 && players[i].y == -1 && players[i].type == 1)
+		{
+			players[i].x = players[0].x;
+			players[i].y = players[0].y;
+			break;
+		}
+	}
+}
+
+void Game::pause()
+{
+	char c = _getch();
+	while (c != 27 && c != ' ')
+		c = _getch();
 }
 
 int menu()
@@ -185,7 +284,7 @@ int menu()
 			case 32:
 				return nowj + 1;
 			default :
-		//		printf("%d", x);
+				printf("%d", x);
 				break;
 			}
 		}
@@ -197,9 +296,12 @@ void load()
 	//预加载
 	loadimage(&img[0], _T("./pic/openimg.jpg"), SWIDTH, SHEIGTHT);
 	putimage(0, 0, &img[0]);
-	Sleep(1000);
+	getchar();
 	cleardevice();
 }
+
+
+
 
 
 /////////////////////////stars
