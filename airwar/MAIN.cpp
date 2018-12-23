@@ -252,8 +252,11 @@ void Game::drawall()
 		}
 	}
 	//draw player
-	putimage(players[0].x, players[0].y, &img[2], SRCAND);
-	putimage(players[0].x, players[0].y, &img[1], SRCPAINT);
+	if (players[0].type >= 0)
+	{
+		putimage(players[0].x, players[0].y, &img[2], SRCAND);
+		putimage(players[0].x, players[0].y, &img[1], SRCPAINT);
+	}
 	//draw bullet
 	for (int i = 1; i <= NumberOfBullet; i++)
 	{
@@ -531,6 +534,7 @@ void load()
 	loadimage(&img[5], _T("./pic/bullet.png"), BULLET_W, BULLET_H);
 	loadimage(&img[6], _T("./pic/bulletmask.png"), BULLET_W, BULLET_H);
 	loadimage(&img[7], _T("./pic/death.png"), SWIDTH, SHEIGTHT);
+	loadimage(&img[8], _T("./pic/deathmask.png"), SWIDTH, SHEIGTHT);
 	putimage(0, 0, &img[0]);
 	getchar();
 	cleardevice();
@@ -564,14 +568,17 @@ char *numtostr(int n)
 
 void Game::endgame()
 {
-	int times = 10;
+	int times = 30;
 	drawall();
 	while (times--)
 	{
-		Sleep(200);
+		Sleep(100);
 		drawall();
 	}
-	putimage(0, 0, &img[7]);
+	BeginBatchDraw();
+	putimage(0, 0, &img[8], SRCAND);
+	putimage(0, 0, &img[7], SRCPAINT);
+	EndBatchDraw();
 	while (_getch() != ' ');
 }
 
