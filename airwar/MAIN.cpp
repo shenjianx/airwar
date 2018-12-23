@@ -10,7 +10,7 @@
 using namespace std;
 
 //宏定义
-#define MAXSTAR 400	// 星星总数
+#define MAXSTAR 300	// 星星总数
 #define NUM 120
 #define SWIDTH 1080
 #define SHEIGTHT 640
@@ -20,7 +20,7 @@ using namespace std;
 #define ENEMY_W 40
 #define BULLET_H 15
 #define BULLET_W 15
-#define PLANESPEED 12
+#define PLANESPEED 16
 
 //全局变量声明
 typedef struct object {
@@ -48,7 +48,6 @@ void draw();
 void ifsave();
 bool ifrestart();
 void readrank();
-void death();
 void load();
 void InitStar(int);
 void MoveStar(int);
@@ -79,6 +78,7 @@ public:
 	void init();
 	void pause();
 	void playing();
+	void endgame();
 
 	bool judge(object,object);
 
@@ -89,13 +89,15 @@ public:
 void Game::playing()
 {
 	bool death = 1;//标记死亡	1 存活	2 死亡
-	int bullet_speed = 10;//子弹速度
-	int enemy_speed = 25;//敌人速度
+	int bullet_speed = 1;//子弹速度
+	int enemy_speed = 2;//敌人速度
 	int bullet = 0; //要发出的子弹数目
-	int bulletrate = 300;//子弹频率
+	int bulletrate = 30;//子弹频率
 	int countrate = 0;
+	int drawrate = 80;
 	int count_bullet = 0;
 	int count_enemy = 0;
+	int count_draw = 0;
 	while (death)
 	{
 		//player move
@@ -123,7 +125,7 @@ void Game::playing()
 			}
 		//	pause();
 		}
-		if (bullet > 1)
+		if (bullet > 2)
 		{
 			bullet = 1;
 		}
@@ -139,7 +141,7 @@ void Game::playing()
 		}
 		else
 		{
-			countrate = bulletrate/2;
+			countrate = 0;
 		}
 		//enemy move
 		
@@ -147,6 +149,21 @@ void Game::playing()
 		{
 			count_enemy = 0;
 			move_enemy();
+			for (int i = NumberOfBullet + 1; i <= NumberOfBullet + NumberOfEnemy; i++)
+			{
+				if (players[i].x == -1 && players[i].y == -1)
+				{
+					continue;
+				}
+				if (judge(players[i], players[0]))
+				{
+					/*players[0].x = -1;
+					players[0].y = -1;*/
+					players[i].x = -1;
+					players[i].y = -1;
+					players[0].type -= 40;
+				}
+			}
 		}
 		count_enemy++;
 		//bullet move
@@ -179,12 +196,22 @@ void Game::playing()
 			}
 		}
 		count_bullet++;
-		
+		/*
+		if (count_draw == drawrate)
+		{
+			count_draw = 0;
+			drawall();
+		}
+		count_draw++;
+		*/
+		if (players[0].type <= 0)
+		{
+			death = 0;
+		}
 		//draw
 		drawall();
-		//Sleep(8);
+		Sleep(1);
 	}
-
 
 
 }
@@ -194,6 +221,7 @@ void Game::drawall()
 	cleardevice();
 	BeginBatchDraw();
 	//draw stars
+	/*
 	static int countstar = 0;
 	int starrate = 15;
 	if (countstar == starrate)
@@ -210,6 +238,10 @@ void Game::drawall()
 			putpixel((int)star[i].x, star[i].y, star[i].color);
 	}
 	countstar++;
+
+	*/
+	for (int i = 0; i < MAXSTAR; i++)
+		MoveStar(i);
 	//draw enemy
 	for (int i = NumberOfBullet + 1; i <= NumberOfBullet + NumberOfEnemy; i++)
 	{
@@ -246,11 +278,11 @@ void Game::init()
 	for (i = 0; i < MAXSTAR; i++)
 	{
 		InitStar(i);
-		star[i].x = rand() % 640;
+		star[i].x = rand() % SWIDTH;
 	}
 	//游戏初始化数据
-	NumberOfEnemy = 8;
-	NumberOfBullet = 20;
+	NumberOfEnemy = 7;
+	NumberOfBullet = 25;
 	score = 0;
 	initplane();
 	initbullet();
@@ -262,7 +294,7 @@ void Game::initplane()
 	//player	0
 	players[0].x = 0 + 20;
 	players[0].y = SHEIGTHT / 2;
-	players[0].type = 0;
+	players[0].type = 100;
 }
 
 void Game::initenemy()
@@ -285,7 +317,7 @@ void Game::initbullet()
 	{
 		players[i].x = -1;
 		players[i].y = -1;
-		players[i].type = 1;
+		players[i].type = -1;
 	}
 }
 
@@ -381,11 +413,30 @@ void Game::pause()
 bool Game::judge(object enemy, object porb)
 {
 	//printf("in judge %d", porb.type);
-	if (porb.type == 0)
+	if (porb.type >= 0)
 	{
-		return 0;
+		int enemy_x = enemy.x + ENEMY_W / 2;
+		int enemy_y = enemy.y + ENEMY_H / 2;
+		int plane_x = porb.x;
+		int plane_y = porb.y;
+		if (enemy_x - plane_x <= ENEMY_W / 2 && enemy_x - plane_x >= -(ENEMY_W / 2) && enemy_y >= plane_y - ENEMY_W / 2 && enemy_y <= plane_y + PLANE_H - 1 + ENEMY_W / 2)
+		{
+			return 1;
+		}
+		else if (enemy_y >= plane_y && enemy_y <= (plane_y + PLANE_H / 2 - 1) && enemy_x - ENEMY_W <= plane_x + 2 * (enemy_y - plane_y) && enemy_x + ENEMY_W >= plane_x + 2 * (enemy_y - plane_y))
+		{
+			return 1;
+		}
+		else if (enemy_y >= plane_y + PLANE_H / 2 - 1 && enemy_y <= (plane_y + PLANE_H - 1) && enemy_x - ENEMY_W <= plane_x + 2 * (plane_y + PLANE_H - 1 - enemy_y) && enemy_x + ENEMY_W >= plane_x + 2 * (plane_y + PLANE_H - 1 - enemy_y))
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
 	}
-	else if (porb.type == 1)
+	else if (porb.type == -1)
 	{
 		int bullet_x = porb.x+BULLET_W/2;
 		int bullet_y = porb.y+BULLET_H/2;
@@ -402,7 +453,7 @@ bool Game::judge(object enemy, object porb)
 	}
 	else
 	{
-		printf("sjcna");
+		return 0;
 	}
 }
 
@@ -510,7 +561,16 @@ char *numtostr(int n)
 	return p;
 }
 
-
+void Game::endgame()
+{
+	int times = 10;
+	drawall();
+	while (times--)
+	{
+		Sleep(200);
+		drawall();
+	}
+}
 
 
 
@@ -557,7 +617,8 @@ int main()
 				while (1) {
 					game.init();
 					game.playing();
-				/*	death();
+					game.endgame();
+					/*
 					ifsave();
 					if (!ifrestart()) {
 						break;
