@@ -156,8 +156,8 @@ void Game::playing()
 					continue;
 				}
 				if (judge(players[i], players[0]))
-				{
-					/*players[0].x = -1;
+				{/*
+					players[0].x = -1;
 					players[0].y = -1;*/
 					players[i].x = -1;
 					players[i].y = -1;
@@ -394,7 +394,7 @@ void Game::shoot()
 {
 	for (int i = 1; i <= NumberOfBullet; i++)
 	{
-		if (players[i].x == -1 && players[i].y == -1 && players[i].type == 1)
+		if (players[i].x == -1 && players[i].y == -1 && players[i].type == -1 )
 		{
 			players[i].x = players[0].x + PLANE_W;
 			players[i].y = players[0].y + PLANE_H / 2-BULLET_H/2-1;
@@ -572,7 +572,7 @@ void Game::endgame()
 		drawall();
 	}
 	putimage(0, 0, &img[7]);
-	_getch();
+	while (_getch() != ' ');
 }
 
 
