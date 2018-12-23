@@ -530,6 +530,7 @@ void load()
 	loadimage(&img[4], _T("./pic/enemymask.png"), ENEMY_W, ENEMY_H);
 	loadimage(&img[5], _T("./pic/bullet.png"), BULLET_W, BULLET_H);
 	loadimage(&img[6], _T("./pic/bulletmask.png"), BULLET_W, BULLET_H);
+	loadimage(&img[7], _T("./pic/death.png"), SWIDTH, SHEIGTHT);
 	putimage(0, 0, &img[0]);
 	getchar();
 	cleardevice();
@@ -570,6 +571,8 @@ void Game::endgame()
 		Sleep(200);
 		drawall();
 	}
+	putimage(0, 0, &img[7]);
+	_getch();
 }
 
 
