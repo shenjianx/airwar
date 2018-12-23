@@ -10,17 +10,17 @@
 using namespace std;
 
 //宏定义
-#define MAXSTAR 300	// 星星总数
-#define NUM 120
-#define SWIDTH 1080
-#define SHEIGTHT 640
-#define PLANE_H 70
-#define PLANE_W 70
-#define ENEMY_H 40
-#define ENEMY_W 40
-#define BULLET_H 15
-#define BULLET_W 15
-#define PLANESPEED 16
+#define MAXSTAR					300	// 星星总数
+#define NUM						140
+#define SWIDTH					1080
+#define SHEIGTHT				640
+#define PLANE_H					70
+#define PLANE_W					70
+#define ENEMY_H					40
+#define ENEMY_W					40
+#define BULLET_H				15
+#define BULLET_W				15
+#define PLANESPEED				18
 
 //全局变量声明
 typedef struct object {
@@ -39,7 +39,7 @@ STAR star[MAXSTAR];
 
 int score;
 int speed;
-IMAGE img[10];
+IMAGE img[11];
 char p[15];
 
 //函数声明
@@ -58,19 +58,22 @@ class Game
 {
 public:
 
-	object players[NUM];//player  bullets  enemys
-	int NumberOfEnemy;//敌人数目
-	int NumberOfBullet;//子弹数目
+	object players[NUM];			//player  bullets  enemys  ...    helps
+	int NumberOfEnemy;				//敌人数目
+	int NumberOfBullet;				//子弹数目
+	int NumberOfHelp;				//医疗包数目
 
 	//函数声明
 	void initplane();
 	void initenemy();
 	void initbullet();
+	void inithelp();
 
 	void move_plane(char);
 	void move_plane(int);
 	void move_enemy();
 	void move_bullet();
+	void move_help();
 
 
 	void drawall();
@@ -79,6 +82,7 @@ public:
 	void pause();
 	void playing();
 	void endgame();
+	void printhelp();
 
 	bool judge(object,object);
 
@@ -88,19 +92,21 @@ public:
 //函数定义
 void Game::playing()
 {
-	bool death = 1;//标记死亡	1 存活	2 死亡
-	int bullet_speed = 1;//子弹速度
-	int enemy_speed = 2;//敌人速度
-	int bullet = 0; //要发出的子弹数目
-	int bulletrate = 30;//子弹频率
+	bool death = 1;						//标记死亡	1 存活	2 死亡
+	int bullet_speed = 1;				//子弹速度
+	int enemy_speed = 2;				//敌人速度
+	int help_speed = 2;					//医疗包速度
+	int bullet = 0;						//要发出的子弹数目
+	int bulletrate = 30;				//子弹频率
 	int countrate = 0;
 	int drawrate = 80;
 	int count_bullet = 0;
 	int count_enemy = 0;
 	int count_draw = 0;
+	int count_help = 0;
 	while (death)
 	{
-		//player move
+		//player move							///////////////////////////////////////player_move
 		if (_kbhit()) 
 		{
 			char x = _getch();
@@ -120,31 +126,13 @@ void Game::playing()
 				bullet++;
 				break;
 			case 27:
+				printhelp();
 				pause();
 			default:break;
 			}
 		//	pause();
 		}
-		if (bullet > 2)
-		{
-			bullet = 1;
-		}
-		if (bullet > 0)
-		{
-			if (countrate == bulletrate)
-			{
-				shoot();
-				bullet--;
-				countrate = 0;
-			}
-			countrate++;
-		}
-		else
-		{
-			countrate = 0;
-		}
-		//enemy move
-		
+		//enemy move							///////////////////////////////////////enemy_move
 		if (count_enemy == enemy_speed)
 		{
 			count_enemy = 0;
@@ -166,7 +154,47 @@ void Game::playing()
 			}
 		}
 		count_enemy++;
-		//bullet move
+		//help move								///////////////////////////////////////help_move
+		if (count_help == help_speed)
+		{
+			count_help = 0;
+			move_help();
+			for (int i = NUM - 1; i >= NUM - NumberOfHelp; i--)
+			{
+				if (players[i].x == -1 && players[i].y == -1)
+				{
+					continue;
+				}
+				if (judge(players[i], players[0]))
+				{/*
+					players[0].x = -1;
+					players[0].y = -1;*/
+					players[i].x = -1;
+					players[i].y = -1;
+					players[0].type += 40;
+				}
+			}
+		}
+		count_help++;
+		//bullet move							///////////////////////////////////////bullet_move
+		if (bullet > 2)
+		{
+			bullet = 1;
+		}
+		if (bullet > 0)
+		{
+			if (countrate == bulletrate)
+			{
+				shoot();
+				bullet--;
+				countrate = 0;
+			}
+			countrate++;
+		}
+		else
+		{
+			countrate = 0;
+		}
 		if (count_bullet == bullet_speed)
 		{
 			count_bullet = 0;
@@ -193,6 +221,22 @@ void Game::playing()
 						score += 20;
 					}
 				}
+				for (int j = NUM - 1; j >=NUM - NumberOfHelp; j--)
+				{
+					if (players[j].x == -1 && players[j].y == -1)
+					{
+						continue;
+					}
+					//printf("in playing %d", players[j].type);
+					if (judge(players[j], players[i]))
+					{
+						players[j].x = -1;
+						players[j].y = -1;
+						players[i].x = -1;
+						players[i].y = -1;
+						score += 120;
+					}
+				}
 			}
 		}
 		count_bullet++;
@@ -208,7 +252,7 @@ void Game::playing()
 		{
 			death = 0;
 		}
-		//draw
+		//draw									///////////////////////////////////////draw
 		drawall();
 		Sleep(1);
 	}
@@ -251,6 +295,17 @@ void Game::drawall()
 			putimage(players[i].x, players[i].y, &img[3], SRCPAINT);
 		}
 	}
+	//draw help
+
+	for (int i = NUM - 1; i >= NUM - NumberOfHelp; i--)
+	{
+		if (players[i].x != -1 && players[i].y != -1)
+		{
+			putimage(players[i].x, players[i].y, &img[10], SRCAND);
+			putimage(players[i].x, players[i].y, &img[9], SRCPAINT);
+		}
+	}
+
 	//draw player
 	if (players[0].type >= 0)
 	{
@@ -260,17 +315,32 @@ void Game::drawall()
 	//draw bullet
 	for (int i = 1; i <= NumberOfBullet; i++)
 	{
-		if (players[i].x != -1 && players[i].y != -1)
+		if (players[i].x != -1 && players[i].y != -1 && players[0].type > 0)
 		{
 			putimage(players[i].x, players[i].y, &img[6], SRCAND);
 			putimage(players[i].x, players[i].y, &img[5], SRCPAINT);
 		}
 	}
 	//draw score
-	RECT r[2] = { {0,0,360,30},{720,0,1080,30} };
+	RECT r[5] = { {60,0,120,30} ,{120,0,180,30},{200,0,260,30}, {260,0,320,30}, {720,0,1080,30} };
 	char *s;
+	char *life;
+	if (players[0].type > 0)
+	{
+		life = numtostr(players[0].type);
+		drawtext(_T("HP:"), &r[2], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		drawtext(_T(life), &r[3], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	}
+	else
+	{
+		drawtext(_T("HP:"), &r[2], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		drawtext(_T(" 0 "), &r[3], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	}
 	s = numtostr(score);
-	drawtext(_T(s), &r[0], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext(_T("得分:"), &r[0], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext(_T(s), &r[1], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	drawtext(_T("按ESC以暂停/获得帮助"), &r[4], DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	
 	EndBatchDraw();
 }
 
@@ -286,10 +356,12 @@ void Game::init()
 	//游戏初始化数据
 	NumberOfEnemy = 7;
 	NumberOfBullet = 25;
+	NumberOfHelp = 1;
 	score = 0;
 	initplane();
 	initbullet();
 	initenemy();
+	inithelp();
 }
 
 void Game::initplane()
@@ -309,6 +381,18 @@ void Game::initenemy()
 		players[i].y = rand()%(SHEIGTHT - ENEMY_H);
 		printf("%d\n", players[i].y);
 		players[i].type = 2;
+	}
+}
+
+void Game::inithelp()
+{
+	int i;
+	//help		3
+	for (i = NUM - 1; i >= NUM -NumberOfHelp; i--) {
+		players[i].x = rand() % 400 + SWIDTH;
+		players[i].y = rand() % (SHEIGTHT - ENEMY_H);
+		printf("---%d\n", players[i].y);
+		players[i].type = 3;
 	}
 }
 
@@ -377,12 +461,34 @@ void Game::move_enemy()
 	{
 		if (players[i].x == -1 && players[i].y == -1 && players[i].type == 2)
 		{
-			players[i].x = SWIDTH+400;
-			players[i].y = rand() %(SHEIGTHT-ENEMY_H);
+			players[i].x = rand() % 400 + SWIDTH;
+			players[i].y = rand() %(SHEIGTHT-ENEMY_H-30);
 		}
 		else
 		{
-			players[i].x -= 5;
+			players[i].x -= 4;
+			if (players[i].x < -ENEMY_W)
+			{
+				players[i].x = -1;
+				players[i].y = -1;
+			}
+		}
+	}
+
+}
+
+void Game::move_help()
+{
+	for (int i = NUM - 1; i >= NUM - NumberOfHelp; i--)
+	{
+		if (players[i].x == -1 && players[i].y == -1 && players[i].type == 3)
+		{
+			players[i].x = rand() % 400 + SWIDTH;
+			players[i].y = rand() % (SHEIGTHT - ENEMY_H - 30);
+		}
+		else
+		{
+			players[i].x -= 3;
 			if (players[i].x < -ENEMY_W)
 			{
 				players[i].x = -1;
@@ -460,6 +566,27 @@ bool Game::judge(object enemy, object porb)
 	}
 }
 
+void Game::endgame()
+{
+	int times = 30;
+	drawall();
+	while (times--)
+	{
+		Sleep(100);
+		drawall();
+	}
+	BeginBatchDraw();
+	putimage(0, 0, &img[8], SRCAND);
+	putimage(0, 0, &img[7], SRCPAINT);
+	EndBatchDraw();
+	while (getchar() != '\n');
+}
+
+void Game::printhelp()
+{
+	//151515151515151515151
+}
+
 int menu()
 {
 	int nowj;//当前选项框所在位置右下角纵坐标
@@ -535,6 +662,8 @@ void load()
 	loadimage(&img[6], _T("./pic/bulletmask.png"), BULLET_W, BULLET_H);
 	loadimage(&img[7], _T("./pic/death.png"), SWIDTH, SHEIGTHT);
 	loadimage(&img[8], _T("./pic/deathmask.png"), SWIDTH, SHEIGTHT);
+	loadimage(&img[9], _T("./pic/help.png"), ENEMY_W, ENEMY_H);
+	loadimage(&img[10], _T("./pic/helpmask.png"), ENEMY_W, ENEMY_H);
 	putimage(0, 0, &img[0]);
 	getchar();
 	cleardevice();
@@ -566,21 +695,7 @@ char *numtostr(int n)
 	return p;
 }
 
-void Game::endgame()
-{
-	int times = 30;
-	drawall();
-	while (times--)
-	{
-		Sleep(100);
-		drawall();
-	}
-	BeginBatchDraw();
-	putimage(0, 0, &img[8], SRCAND);
-	putimage(0, 0, &img[7], SRCPAINT);
-	EndBatchDraw();
-	while (_getch() != ' ');
-}
+
 
 
 
